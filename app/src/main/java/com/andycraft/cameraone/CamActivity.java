@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.os.Build;
@@ -14,15 +15,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 public class CamActivity extends AppCompatActivity {
 
     private static final int CAM_PERMISSION = 1000;
-    private ImageSurfaceView mImageSurfaceView;
-    private Camera camera;
-    private FrameLayout cameraPreviewLayout;
-    private ImageView capturedImageHolder;
     PictureCallback pictureCallback = new PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
@@ -31,12 +29,30 @@ public class CamActivity extends AppCompatActivity {
                 Toast.makeText(CamActivity.this, "Captured image is empty", Toast.LENGTH_LONG).show();
                 return;
             }
-            capturedImageHolder.setImageBitmap(bitmap);
+//            capturedImageHolder.setImageBitmap(bitmap);
+
+
+            ImageView imageView = new ImageView(getApplicationContext());
+
+//            Matrix matrix = new Matrix();
+//            imageView.setScaleType(ImageView.ScaleType.MATRIX);   //required
+//            matrix.postRotate(90f, imageView.getDrawable().getBounds().width() / 2f, imageView.getDrawable().getBounds().height() / 2f);
+//            imageView.setImageMatrix(matrix);
+
+
+            imageView.setImageBitmap(bitmap);
+            imageView.setRotation(90f);
+            ((LinearLayout) findViewById(R.id.imgcontainer)).addView(
+                    imageView);
 //            capturedImageHolder.setImageBitmap(scaleDownBitmapImage(bitmap, 300, 200));
             camera.startPreview();
 
         }
     };
+    private ImageSurfaceView mImageSurfaceView;
+    private Camera camera;
+//    private ImageView capturedImageHolder;
+    private FrameLayout cameraPreviewLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +60,7 @@ public class CamActivity extends AppCompatActivity {
         setContentView(R.layout.activity_cam);
 
         cameraPreviewLayout = findViewById(R.id.camera_preview);
-        capturedImageHolder = findViewById(R.id.captured_image);
+//        capturedImageHolder = findViewById(R.id.captured_image);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.CAMERA)
@@ -79,6 +95,11 @@ public class CamActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return mCamera;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
